@@ -17,6 +17,8 @@
 - **Optimizer / schedule**: `adamw_8bit`, learning rate = 2e-4, cosine schedule, warmup ratio = 0.10
 - **Estimated training cost**: $0.07, based on total training time 12.3 minutes at $0.35/hour
 
+![Setup and functionality metrics](results/screenshots/setup_functionality_metrics.png)
+
 ## 2. Rank Experiment Results
 
 | Rank | Alpha | Trainable Params | Train Time | Peak VRAM | Eval Loss | Perplexity |
@@ -24,6 +26,8 @@
 | 8 | 16 | 1,843,200 | 3.93 min | 10.70 GB | 1.5577 | 4.7479 |
 | 16 | 32 | 3,686,400 | 4.46 min | 10.12 GB | 1.5161 | 4.5544 |
 | 64 | 128 | 14,745,600 | 3.96 min | 11.48 GB | 1.4768 | 4.3790 |
+
+![Rank experiment metrics](results/screenshots/rank_experiment_metrics.png)
 
 The quantitative result shows a consistent improvement in eval loss and perplexity when increasing rank. Rank 64 achieved the best perplexity, but it used 4x more trainable parameters than rank 16 and 8x more than rank 8. The improvement from r=16 to r=64 was real but relatively small: perplexity improved from 4.5544 to 4.3790. For this small 200-sample dataset, r=64 did not take much longer than r=16, but it did require the highest peak VRAM.
 
@@ -87,9 +91,13 @@ There is no strong evidence of overfitting from the available metrics. A stronge
 
 **Nhận xét**: Slightly improved. Fine-tuned output có cấu trúc tốt hơn, nhưng vẫn cần nói rõ hơn rằng RAG dùng retrieval cho knowledge và fine-tuning phù hợp style/format.
 
+![Qualitative comparison evidence](results/screenshots/qualitative_comparison_evidence.png)
+
 ## 5. Conclusion về Rank Trade-off
 
 Trong thí nghiệm này, rank 64 cho kết quả quantitative tốt nhất với eval loss = 1.4768 và perplexity = 4.3790. Tuy nhiên, rank 64 có 14.7M trainable parameters, gấp 4 lần so với rank 16 và 8 lần so với rank 8. Nếu chỉ nhìn chất lượng eval, r=64 là adapter tốt nhất. Nếu cần cân bằng giữa chất lượng, VRAM và kích thước adapter, r=16 là lựa chọn hợp lý hơn: perplexity 4.5544 chỉ kém r=64 một khoảng nhỏ, trong khi số tham số ít hơn nhiều. Rank 8 phù hợp khi tài nguyên rất hạn chế, nhưng trong run này perplexity cao nhất nên khả năng học style/format yếu hơn. Nếu deploy production cho một task nhỏ và cần chi phí thấp, tôi sẽ chọn r=16. Nếu mục tiêu ưu tiên chất lượng offline và GPU đủ thoải mái, r=64 có thể đáng chọn. Ngoài ra, qualitative evaluation cho thấy perplexity tốt hơn không đảm bảo mọi câu trả lời đều đúng factual, vì r=16 vẫn sai ở câu LoRA/QLoRA.
+
+![Rubric score evidence](results/screenshots/rubric_score_evidence.png)
 
 ## 6. What I Learned
 
